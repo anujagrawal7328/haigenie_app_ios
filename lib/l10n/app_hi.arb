@@ -1,0 +1,44 @@
+{
+      "@@locale": "hi",
+      "landingPageHeading": "हेजिनी में आपका स्वागत है",
+      "@landingPageHeading": {
+          "description": "Heading shown on the landing page."
+      },
+      "guideVideo": "गाइड वीडियो चलाएं",
+      "@guideVideo": {
+          "description": "Guide Video Button Text"
+      },
+      "attemptsRemaining": "प्रयास बाकी है",
+      "@attemptsRemaining": {
+          "description": "Number of attempts text"
+      },
+      "yourPastScore": "आपका पिछला स्कोर",
+      "haigenieScore": "हेजिनी स्कोर",
+      "email": "ईमेल",
+      "password" : "पासवर्ड",
+      "login" : "लॉगिन",
+      "forgotPassword" : "पासवर्ड भूल गए?",
+      "register": "रजिस्टर",
+      "policy" : "मैं गोपनीयता नीति से सहमत हूं",
+      "fullName" : "पूरा नाम",
+      "organisation": "संगठन",
+      "mobileNumber": " व्हाट्सएप मोबाइल नंबर",
+      "dept": "विभाग",
+      "district": "जिला",
+      "state": "राज्य",
+      "country": "देश",
+      "india": "भारत",
+      "role" : "भूमिका",
+      "passwordReset" : "पासवर्ड रीसेट",
+      "reset" :"रीसेट",
+      "roleType": "{role,select ,admin{व्यवस्थापक} nurse{नर्स} pharmacist{फार्मासिस्ट} other{अन्य} doctor{डॉक्टर}}",
+              "@roleType": {
+                "description": "A roleType",
+                  "placeholders": {
+                    "role": {
+                      "type": "String"
+                    }
+                  }
+                }
+
+  }

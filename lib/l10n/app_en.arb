@@ -1,0 +1,44 @@
+{
+      "@@locale": "en",
+      "landingPageHeading": "Welcome to HAIgenie",
+      "@landingPageHeading": {
+          "description": "Heading shown on the landing page."
+      },
+      "guideVideo": "Play The Guide Video",
+      "@guideVideo": {
+          "description": "Guide Video Button Text"
+      },
+      "attemptsRemaining": "Attempts Remaining",
+      "@attemptsRemaining": {
+          "description": "Number of attempts text"
+      },
+      "yourPastScore": "Your Past Score",
+      "haigenieScore": "HAIgenie Score",
+      "email": "Email",
+      "password" : "Password",
+      "login" : "Login",
+      "forgotPassword" : "Forgot Password",
+      "register": "Register",
+      "policy" : "I agree to the privacy policy",
+      "fullName" : "Full Name",
+      "organisation": "Organisation",
+      "mobileNumber": " WhatsApp Mobile No.",
+      "dept": "Dept",
+      "district": "District",
+      "state": "State",
+      "country": "Country",
+      "india": "India",
+      "role" : "Role",
+      "passwordReset": "Password Reset",
+      "reset": "Reset",
+      "roleType": "{role,select ,admin{Admin} nurse{Nurse} pharmacist{Pharmacist} other{Other} doctor{Doctor}}",
+        "@roleType": {
+          "description": "A roleType",
+            "placeholders": {
+              "role": {
+                "type": "String"
+              }
+            }
+          }
+
+}
