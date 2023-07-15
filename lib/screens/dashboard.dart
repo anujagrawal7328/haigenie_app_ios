@@ -7,7 +7,7 @@ import '../model/score.dart';
 import '../model/user.dart';
 import '../services/authRepository.dart';
 import 'dart:math' as math;
-
+import 'package:url_launcher/url_launcher.dart';
 import '../services/model_inference_service.dart';
 import '../services/service_locator.dart';
 
@@ -166,7 +166,12 @@ class _DashboardScreenState extends State<DashboardScreen>
     _animationController.dispose();
     super.dispose();
   }
-
+  String? encodeQueryParameters(Map<String, String> params) {
+    return params.entries
+        .map((MapEntry<String, String> e) =>
+    '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .join('&');
+  }
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       color: Colors.black,
@@ -301,6 +306,22 @@ class _DashboardScreenState extends State<DashboardScreen>
                 Navigator.of(context).pushNamed('/settings');
               },
             ),
+             ListTile(
+                          leading: const Icon(Icons.delete_sweep),
+                          title: const Text('Account Deletion Request',
+                              style: TextStyle(
+                                color: Colors.black,
+                              )),
+                          onTap: () {
+                           final uri =Uri(
+                         scheme:'mailto',
+                         path:'support@datakalp.com',
+                           query:encodeQueryParameters(<String,String>{
+                             'subject':'Request for permanent Account Deletion'
+                           }));
+                         launchUrl(uri);
+                          },
+                        ),
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Logout',
