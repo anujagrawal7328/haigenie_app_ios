@@ -36,7 +36,7 @@ class RecordingsRepository {
         if (result['step_5']['feedback'] == 1) score++;
         if (result['step_6']['feedback'] == 1) score++;
         if (result['step_7']['feedback'] == 1) score++;
-        final updatedAt = DateTime.parse(responseData[i]['updatedAt']);
+        final updatedAt = DateTime.parse(responseData[i]['updatedAt']).toLocal();
         final formattedDateTime =
         DateFormat('EEE, MMM d, yyyy, hh:mm a').format(updatedAt);
         final data = Score(score1:double.parse(result['step_2']['feedback'].toString()),
@@ -92,11 +92,11 @@ class RecordingsRepository {
     final time=hour.toString()+minute.toString()+second.toString();
     var videoName = '${user.email! + '_' + deviceModel}_appv0.1_${DateTime(current.year, current.month, current.day)}_${time}_video$current.mp4';
     String videoNameWithoutSpaces = videoName.replaceAll(RegExp(r'\s+'), '');
-    final gifTime ={"step_2": {"gif_start_time": 5, "gif_end_time": 9, "visited": true},
+    final gifTime ={"step_2": {"gif_start_time": 6, "gif_end_time": 9, "visited": true},
     "step_3": {"gif_start_time": 9, "gif_end_time": 16, "visited": true},
     "step_4": {"gif_start_time": 16, "gif_end_time": 20, "visited": true},
-    "step_5": {"gif_start_time": 20, "gif_end_time":27, "visited": true},
-    "step_6": {"gif_start_time": 27, "gif_end_time": 34, "visited": true},
+    "step_5": {"gif_start_time": 20, "gif_end_time":26, "visited": true},
+    "step_6": {"gif_start_time": 26, "gif_end_time": 34, "visited": true},
     "step_7": {"gif_start_time": 34, "gif_end_time": 41, "visited": true}
      };
     final request = http.MultipartRequest('POST',url);
@@ -127,7 +127,7 @@ class RecordingsRepository {
       if (result['step_5']['feedback'] == 1) score++;
       if (result['step_6']['feedback'] == 1) score++;
       if (result['step_7']['feedback'] == 1) score++;
-      final updatedAt = DateTime.now();
+      final updatedAt = DateTime.now().toLocal();
       final formattedDateTime =
       DateFormat('EEE, MMM d, yyyy, hh:mm a').format(updatedAt);
       final data = Score(score1:double.parse(result['step_2']['feedback'].toString()),

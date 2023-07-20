@@ -8,8 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:haigenie/l10n/l10n.dart';
 import 'package:haigenie/screens/widgets/hands_painter.dart';
 import 'package:pausable_timer/pausable_timer.dart';
-import 'package:scidart/numdart.dart';
 import 'package:video_player/video_player.dart';
+import 'package:wakelock/wakelock.dart';
 import '../model/score.dart';
 import '../model/user.dart';
 import '../services/VideoRecordingRepository.dart';
@@ -61,29 +61,35 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
   final AudioPlayer audioPlayer = AudioPlayer();
   final List<String> _imageUrlsEN = [
     'assets/Images/Screensaver/Screensaver_English/screensaver_6.png',
-    'assets/Images/Screensaver/Screensaver_English/screensaver_7.png',
-    'assets/Images/Screensaver/Screensaver_English/screensaver_8.png',
-    'assets/Images/Screensaver/Screensaver_English/screensaver_9.png',
+    'assets/Images/Screensaver/Screensaver_English/hand.png',
+    'assets/Images/Screensaver/Screensaver_English/Moment__1.png',
+    'assets/Images/Screensaver/Screensaver_English/Moment__2.png',
+    'assets/Images/Screensaver/Screensaver_English/Moment__3.png',
+    'assets/Images/Screensaver/Screensaver_English/Moment__4.png',
+    'assets/Images/Screensaver/Screensaver_English/Moment__5.png',
   ];
   final List<String> _imageUrlsHI = [
     'assets/Images/Screensaver/Screensaver_Hindi/screensaver_2.png',
     'assets/Images/Screensaver/Screensaver_Hindi/screensaver_6.png',
-    'assets/Images/Screensaver/Screensaver_Hindi/screensaver_7.png',
-    'assets/Images/Screensaver/Screensaver_Hindi/screensaver_8.png',
-    'assets/Images/Screensaver/Screensaver_Hindi/screensaver_9.png',
+    'assets/Images/Screensaver/Screensaver_Hindi/Moment_1.png',
+    'assets/Images/Screensaver/Screensaver_Hindi/Moment_2.png',
+    'assets/Images/Screensaver/Screensaver_Hindi/Moment_3.png',
+    'assets/Images/Screensaver/Screensaver_Hindi/Moment_4.png',
+    'assets/Images/Screensaver/Screensaver_Hindi/Moment_5.png',
   ];
 
   @override
   void initState() {
     super.initState();
+    Wakelock.disable();
     SchedulerBinding.instance.addPostFrameCallback((_) {
       final currentLocale = Localizations.localeOf(context);
       setState(() {
         _selectedLocale = currentLocale;
       });
       _controller = _selectedLocale == const Locale('en')
-          ? VideoPlayerController.asset('assets/videos/guide.mp4')
-          : VideoPlayerController.asset('assets/videos/newGuideHindi.mp4');
+          ? VideoPlayerController.asset('assets/videos/guide.mp4',videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true))
+          : VideoPlayerController.asset('assets/videos/newGuideHindi.mp4',videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
       _controller.initialize().then((_) {
         setState(() {});
       });
@@ -122,6 +128,12 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
     setState(() {
       _isLoading = false;
     });
+    _selectedLocale == const Locale('en')?await audioPlayer.play(AssetSource('audios/Section_1.1.m4a')):await audioPlayer.play(AssetSource('audios/Hindi_Section1.mp3'));
+    final duration = await audioPlayer.getCurrentPosition();
+    print(duration);
+    if (duration! > const Duration(seconds: 25)) {
+      audioPlayer.stop();
+    }
   }
 
   @override
@@ -133,6 +145,7 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
     _modelInferenceService.inferenceResults = null;
     _controller.dispose();
     audioPlayer.dispose();
+    Wakelock.enable();
     super.dispose();
   }
 
@@ -152,16 +165,18 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
   Future<void> _initializeCamera() async {
     _cameras = await availableCameras();
 
-    /* final externalCamera = await getExternalCamera(); */
+   /* final externalCamera = await getExternalCamera();*/
     final cameraDescription = _cameras.firstWhere(
             (camera) => camera.lensDirection == CameraLensDirection.front,
           );
 
     _cameraController = CameraController(
       cameraDescription,
-      ResolutionPreset.medium,
+      ResolutionPreset.low,
       enableAudio: false,
     );
+
+
 
     _cameraController!.addListener(() {
       if (mounted) setState(() {});
@@ -172,8 +187,9 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
     });
 
     try {
-      await _cameraController!.initialize().then((value) {
+      await _cameraController!.initialize().then((value) async {
         if (!mounted) return;
+        await _cameraController?.unlockCaptureOrientation();
       });
     } on CameraException catch (e) {
       _showInSnackBar('Error: ${e.code}\n${e.description}');
@@ -268,7 +284,7 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
       if (result != []) {
         Navigator.of(context).pushNamedAndRemoveUntil(
             '/score', (Route<dynamic> route) => false,
-            arguments: [result, widget.user, videoPath]);
+            arguments: [result, widget.user, videoPath,widget.guide]);
         _isComputing = false;
       } else {
         print('Video upload Failed');
@@ -278,7 +294,7 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
     }
   }
 
-  /* Future<UsbDevice?> getExternalCamera() async {
+  /*Future<UsbDevice?> getExternalCamera() async {
     final devices = await UsbSerial.listDevices();
 
     for (final device in devices) {
@@ -288,13 +304,13 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
     }
 
     return null;
-  } */
+  }*/
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    if(_isComputing)audioPlayer.play(AssetSource('audios/Music_3.mp3'));
-    if(!_isComputing)audioPlayer.stop();
+    if (_isComputing) audioPlayer.play(AssetSource('audios/Music_3.mp3'));
+
     return OrientationBuilder(builder: (context, orientation) {
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.landscapeLeft,
@@ -303,7 +319,8 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
       return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
-          title: Image.asset("assets/Images/logo.png", width: 50, height: 50),
+          title:
+              Image.asset("assets/Images/app_icon.png", width: 80, height: 80),
           centerTitle: true,
           leading: IconButton(
             onPressed: () {
@@ -379,8 +396,9 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 _buildGenieImage(),
-                                const SizedBox(width: 20.0),
+                                const SizedBox(width: 5.0),
                                 Column(children: [
+                                  const SizedBox(height: 40.0),
                                   _buildTimer(),
                                   const SizedBox(height: 20.0),
                                   _buildStepsBox()
@@ -394,28 +412,29 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
             : Stack(children: [
                 Positioned(
                   top: 10,
-                  left: 10,
-                  right: 10,
+                  left: 0,
+                  right: 0,
                   child: Container(
-                    color: Colors.black,
-                    child: const Center(
+                    color: Colors.blue,
+                    height: 30,
+                    child: Center(
                       child: Text(
-                        'Lets find out your HAIgenie score!',
-                        style: TextStyle(
+                        l10n.screensvaer_title,
+                        style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 24.0,
+                          fontSize: 20.0,
                         ),
                       ),
                     ),
                   ),
                 ),
                 Positioned(
-                    top: 60,
+                    top: 50,
                     left: 10,
                     right: 10,
                     child: SizedBox(
-                        width: 200,
-                        height: 200,
+                        width: MediaQuery.of(context).size.height - 180,
+                        height: MediaQuery.of(context).size.height - 180,
                         child: AnimatedSwitcher(
                           duration: const Duration(seconds: 1),
                           child: Image.asset(
@@ -425,16 +444,16 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
                         ))),
                 Positioned(
                     bottom: 0,
-                    left: 10,
-                    right: 10,
+                    left: 0,
+                    right: 0,
                     child: Container(
                       width: MediaQuery.of(context).size.width,
                       height: 25,
-                      color: Colors.black,
-                      child: const Center(
+                      color: Colors.blue,
+                      child: Center(
                           child: Text(
-                        'Please Wait ... Good things take time',
-                        style: TextStyle(color: Colors.white),
+                        l10n.screensaver_loading,
+                        style: const TextStyle(color: Colors.white),
                       )),
                     )),
               ]),
@@ -469,7 +488,7 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
 
   Widget _buildTimer() {
     return Container(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(25.0),
       decoration: BoxDecoration(
         color: Colors.blue,
         borderRadius: BorderRadius.circular(8.0),
@@ -495,9 +514,11 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
   }
 
   Widget _buildStepsBox() {
+    final l10n = context.l10n;
     return Container(
-      height: 80,
-      padding: const EdgeInsets.all(8.0),
+      height: 100,
+      width: 150,
+      padding: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8.0),
@@ -515,70 +536,78 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
         int.parse(_remainingTime) >= 37
             ? const Text(
                 '',
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 24.0,
+                  fontSize: 18.0,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
               )
             : int.parse(_remainingTime) > 32
-                ? const Text(
-                    'step1',
+                ? Text(
+                    'step1\n${l10n.palm_to_palm}',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 24.0,
+                      fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
                   )
                 : int.parse(_remainingTime) > 25
-                    ? const Text(
-                        'Step2',
+                    ? Text(
+                        'Step2\n${l10n.palm_to_dorsum}',
+                        textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 24.0,
+                          fontSize: 18.0,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
                       )
                     : int.parse(_remainingTime) > 21
-                        ? const Text(
-                            'Step3',
+                        ? Text(
+                            'Step3\n${l10n.fingers_interlaced}',
+                            textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 24.0,
+                              fontSize: 18.0,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
                           )
-                        : int.parse(_remainingTime) > 14
-                            ? const Text(
-                                'Step4',
+                        : int.parse(_remainingTime) > 15
+                            ? Text(
+                                'Step4\n${l10n.fist_interlocked}',
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 24.0,
+                                  fontSize: 18.0,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
                               )
-                            : int.parse(_remainingTime) > 6
-                                ? const Text(
-                                    'Step5',
+                            : int.parse(_remainingTime) > 7
+                                ? Text(
+                                    'Step5\n${l10n.thumb_rub}',
+                                    textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      fontSize: 24.0,
+                                      fontSize: 18.0,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
                                     ),
                                   )
                                 : int.parse(_remainingTime) > 0
-                                    ? const Text(
-                                        'Step6',
+                                    ? Text(
+                                        'Step6\n${l10n.palm_to_fingertips}',
+                                        textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          fontSize: 24.0,
+                                          fontSize: 18.0,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
                                         ),
                                       )
-                                    : const Text(
+                                    : Text(
                                         'Ended',
+                                        textAlign: TextAlign.center,
                                         style: TextStyle(
-                                          fontSize: 24.0,
+                                          fontSize: 18.0,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.white,
                                         ),
@@ -589,7 +618,7 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
 
   Widget _buildGenieImage() {
     // Replace this with your actual genie image widget
-    return Image.asset("assets/Images/Genie.jpeg", width: 200, height: 200);
+    return Image.asset("assets/Images/Genie.jpeg", width: 250, height: 250);
   }
 
   Widget _buildVideoPlayer() {
@@ -608,6 +637,7 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
   }
 
   Widget _buildCameraPreview() {
+    final l10n = context.l10n;
     late final double ratio;
     final Map<String, dynamic>? inferenceResults =
         locator<ModelInferenceService>().inferenceResults;
@@ -626,10 +656,12 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
             pause = false;
             _isRecording = true;
           });
+          await audioPlayer.stop();
           await _controller.seekTo(Duration.zero);
           await _controller.play();
           await _cameraController?.prepareForVideoRecording();
           await _cameraController?.startVideoRecording();
+          setState(() {});
           _timer = PausableTimer(const Duration(seconds: 41), () async {
             setState(() {
               _isRecording = false;
@@ -694,27 +726,29 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
             ),
           ),*/
           if (_isRecording)
-            Positioned(
-              top: 30,
-              left: 60,
-              right: 40,
-              child: Container(
-                height: 40.0,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: const Center(
-                  child: Text(
-                    'Please mimic the motion at the right',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15.0,
+            widget.guide == false
+                ? Container()
+                : Positioned(
+                    top: 30,
+                    left: 60,
+                    right: 40,
+                    child: Container(
+                      height: 40.0,
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Center(
+                        child: Text(
+                          l10n.motion_mimic_message,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15.0,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ),
           if (!_isRecording)
             Positioned(
                 top: 30,
@@ -723,31 +757,31 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
                 child: Container(
                   height: 60.0,
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: Colors.blue,
                     borderRadius: BorderRadius.circular(5),
                   ),
                   child: Center(
                     child: RichText(
                       textAlign: TextAlign.center,
-                      text: const TextSpan(
+                      text: TextSpan(
                         children: [
                           TextSpan(
-                            text: 'Put mobile on a flat surace\n',
-                            style: TextStyle(
+                            text: '${l10n.guide_message_part_1}\n',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 15,
                             ),
                           ),
                           TextSpan(
-                            text: 'facing cieling and then\n',
-                            style: TextStyle(
+                            text: '${l10n.guide_message_part_2}\n',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 15,
                             ),
                           ),
                           TextSpan(
-                            text: 'tap here',
-                            style: TextStyle(
+                            text: l10n.guide_message_part_3,
+                            style: const TextStyle(
                               color: Colors.red,
                               fontSize: 15,
                             ),

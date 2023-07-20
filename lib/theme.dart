@@ -4,14 +4,14 @@ import 'package:flutter_localization/flutter_localization.dart';
 final FlutterLocalization _localization = FlutterLocalization.instance;
 final ThemeData lightTheme = ThemeData.light()
     .copyWith(
-  colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF00a2d8)),
+  colorScheme: ColorScheme.fromSeed(seedColor:Colors.blue),
   useMaterial3: true,
   visualDensity: VisualDensity.adaptivePlatformDensity,
   scaffoldBackgroundColor: Colors.white,
   appBarTheme: const AppBarTheme(
       color: Colors.white,
       elevation: 0,
-      iconTheme: IconThemeData(color: Color(0xFF00a2d8))),
+      iconTheme: IconThemeData(color: Colors.blue)),
   textTheme: TextTheme(
     bodyMedium: TextStyle(
       color: Colors.black.withOpacity(0.87),

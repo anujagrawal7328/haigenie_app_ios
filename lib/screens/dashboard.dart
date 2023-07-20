@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:haigenie/l10n/l10n.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../model/score.dart';
 import '../model/user.dart';
 import '../services/authRepository.dart';
 import 'dart:math' as math;
-import 'package:url_launcher/url_launcher.dart';
+
 import '../services/model_inference_service.dart';
 import '../services/service_locator.dart';
 
@@ -15,7 +16,6 @@ class DashboardScreen extends StatefulWidget {
   final User user;
   final List<Score>? score;
   const DashboardScreen({super.key, required this.user, required this.score});
-
   @override
   State<StatefulWidget> createState() => _DashboardScreenState();
 }
@@ -37,7 +37,7 @@ class _DashboardScreenState extends State<DashboardScreen>
       fontWeight: FontWeight.bold,
       color: Colors.grey,
       fontFamily: 'Digital',
-      fontSize: 23 * chartWidth / 1250,
+      fontSize: 30 * chartWidth / 2000,
     );
     String text;
     switch (value.toInt()) {
@@ -123,7 +123,9 @@ class _DashboardScreenState extends State<DashboardScreen>
           transform: Matrix4.skewY(
               -0.1), // Adjust the skew angle as per your preference
           child: Text(
-              '${text.substring(0, 12)}\n${text.substring(12, 24)}\n${text.substring(24, text.length)}',
+              '${text.substring(0, 18)}\n${text.substring(18, text.length)}'
+                  /*'\n${text.substring(24, text.length)}'*/
+              ,
               style: style)),
     );
   }
@@ -215,9 +217,6 @@ class _DashboardScreenState extends State<DashboardScreen>
               strokeColor: Colors.blueAccent,
             );
           },
-          checkToShowDot: (spot, barData) {
-            return spot.x != 0 && spot.x != 6;
-          },
         ),
       ),
     ];
@@ -228,24 +227,31 @@ class _DashboardScreenState extends State<DashboardScreen>
         DeviceOrientation.portraitUp,
       ]);
       return Scaffold(
-      appBar: AppBar(
+      appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(80.0),
+          child:AppBar(
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
-              icon: const Icon(Icons.menu, size: 30.0),
+              icon: const Icon(Icons.menu, size: 35.0),
               onPressed: () {
                 Scaffold.of(context).openDrawer();
               },
             );
           },
         ),
-        title: Image.asset(
-          'assets/Images/logo.png', // Replace with your logo image path
-          width: 50,
-          height: 50,
-        ),
-        centerTitle: true,
+        // title: Image.asset(
+        //   'assets/Images/app_icon.png', // Replace with your logo image path
+        //   width: 70,
+        //   height: 70,
+        // ),
+        // centerTitle: true,
         actions: [
+          Image.asset(
+            'assets/Images/app_icon.png', // Replace with your logo image path
+            width: 80,
+            height: 80,
+          ),
           downloadAvailable
               ? IconButton(
                   icon: const Icon(Icons.download, size: 30.0),
@@ -255,14 +261,14 @@ class _DashboardScreenState extends State<DashboardScreen>
                 )
               : const Text(''),
         ],
-      ),
+      )),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
               decoration: const BoxDecoration(
-                color: Color(0xFF00a2d8),
+                color: Colors.blue,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,41 +293,33 @@ class _DashboardScreenState extends State<DashboardScreen>
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Home',
-                  style: TextStyle(
-                    color: Colors.black,
-                  )),
-              onTap: () {
-                // Handle Home item tap
-              },
-            ),
-            ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text('Settings',
+              title: const Text('Profile',
                   style: TextStyle(
                     color: Colors.black,
                   )),
               onTap: () {
-                Navigator.of(context).pushNamed('/settings');
+                Navigator.of(context).pushNamed('/settings',arguments: [widget.user]);
               },
             ),
-             ListTile(
-                          leading: const Icon(Icons.delete_sweep),
-                          title: const Text('Account Deletion Request',
-                              style: TextStyle(
-                                color: Colors.black,
-                              )),
-                          onTap: () {
-                           final uri =Uri(
-                         scheme:'mailto',
-                         path:'support@datakalp.com',
-                           query:encodeQueryParameters(<String,String>{
-                             'subject':'Request for permanent Account Deletion'
-                           }));
-                         launchUrl(uri);
-                          },
-                        ),
+         /*   ListTile(
+              leading: const Icon(Icons.delete_sweep),
+              title: const Text('Account Deletion Request',
+                  style: TextStyle(
+                    color: Colors.black,
+                  )),
+              onTap: () {
+                final Uri emailLaunchUri = Uri(
+                  scheme: 'mailto',
+                  path: 'support@datakalp.com',
+                  query: encodeQueryParameters(<String, String>{
+                    'subject': 'Request for permanent Account Deletion Request',
+                  }),
+                );
+
+                launchUrl(emailLaunchUri);
+              },
+            ),*/
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Logout',
@@ -331,9 +329,54 @@ class _DashboardScreenState extends State<DashboardScreen>
               onTap: () async {
                 bool logout = await authRepository.logout();
                 if (logout == true) {
-                  Navigator.pushReplacementNamed(context, '/auth');
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/auth', // Replace with the route name for your login screen
+                    ModalRoute.withName('/auth'), // Remove all existing routes from the stack
+                  );
                 }
               },
+            ),
+            Container(
+              padding: EdgeInsets.fromLTRB(15.0, MediaQuery.of(context).size.height-420, 0.0,0.0),
+             child: Center(
+                  child: RichText(text: const TextSpan(children: [
+                    TextSpan(
+                    text: 'Contact',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                  ]
+                  ),
+                textAlign: TextAlign.center,
+                  )),
+            ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(15.0, 0, 0.0,0.0),
+              child: Center(
+                  child: GestureDetector(
+                      onTap: () async {
+                        final Uri emailLaunchUri = Uri(
+                            scheme: 'mailto',
+                            path: 'support@datakalp.com'
+                        );
+                        launchUrl(emailLaunchUri);
+                      },
+                      child:RichText(text: const TextSpan(children: [
+                    TextSpan(
+                        text: 'support@datakalp.com',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        )),
+                  ]
+                  ),
+                    textAlign: TextAlign.center,
+                  ))),
             ),
           ],
         ),
@@ -356,24 +399,24 @@ class _DashboardScreenState extends State<DashboardScreen>
             ),
           ),
           const SizedBox(height: 16),
-          widget.user.userType == "certification"
+         /* widget.user.userType == "certification"
               ? ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pushNamed('/guide');
                   },
                   child: Text(l10n.guideVideo),
                 )
-              : Container(),
+              : Container(),*/
           const SizedBox(height: 16),
-          widget.user.userType == "certification"
+     /*     widget.user.userType == "certification"
               ? Text(
                   '${widget.user.availableAttempts} ${l10n.attemptsRemaining}',
                   style: const TextStyle(
                     fontSize: 18,
                   ),
                 )
-              : Container(),
-          const SizedBox(height: 20),
+              : Container(),*/
+         /* const SizedBox(height: 20),*/
           /*  AnimatedBuilder(
               animation: _animationController,
               builder: (context, child) {
@@ -398,8 +441,73 @@ class _DashboardScreenState extends State<DashboardScreen>
                 );
               }),*/
           widget.user.userType == "certification"
-              ? ClipOval(
-                  child: ElevatedButton(
+              ? Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  locator<ModelInferenceService>().setModelConfig();
+                  Navigator.of(context).pushNamed('/recorder',
+                      arguments: [widget.user, widget.score, true]);
+                },
+                style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.all(10.0),
+                    elevation:
+                    10.0, // Adjust the value to change the button shape
+                    shadowColor: Colors.black.withOpacity(
+                        0.4), // Adjust the shadow color and opacity
+                    splashFactory: InkRipple.splashFactory,
+                    backgroundColor: Colors.blue
+                ),
+                child: SizedBox(
+                  width: (MediaQuery.of(context).size.width/2)-50,
+                  height: 80.0,
+                  child: Center(
+                    child:RichText(
+                      textAlign: TextAlign.center,
+                      text:  TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '${l10n.practice_mode}\n',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                            ),
+                          ),
+                          TextSpan(
+                            text: '(${l10n.only} ',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                            ),
+                          ),
+                          TextSpan(
+                            text: '${widget.user.availableAttempts}',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                            ),
+                          ),
+                          TextSpan(
+                            text: ' ${l10n.attempts})',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                            ),
+                          ),
+                          /*   TextSpan(
+                              text: l10n.guide_message_part_3,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 15,
+                              ),
+                            ),*/
+                        ],
+                      ),
+                    ),
+                  ),
+                )),
+              ElevatedButton(
                   onPressed: () {
                     locator<ModelInferenceService>().setModelConfig();
                     Navigator.of(context).pushNamed('/recorder',
@@ -412,18 +520,51 @@ class _DashboardScreenState extends State<DashboardScreen>
                     shadowColor: Colors.black.withOpacity(
                         0.4), // Adjust the shadow color and opacity
                     splashFactory: InkRipple.splashFactory,
+                    backgroundColor: Colors.blue
                   ),
-                  child: const SizedBox(
-                    width: 250.0,
-                    height: 100.0,
+                  child:SizedBox(
+                    width: MediaQuery.of(context).size.width/2-50,
+                    height: 60,
                     child: Center(
-                      child: Text(
-                        'Start New Assessment Attempt',
-                        style: TextStyle(fontSize: 15.0),
+                      child:RichText(
+                        textAlign: TextAlign.center,
+                        text:  TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '${l10n.start_assesment}\n',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                              ),
+                            ),
+                            TextSpan(
+                              text: '(${l10n.only} ',
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                              ),
+                            ),
+                            TextSpan(
+                              text: '${widget.user.certificationAttempts}',
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                              ),
+                            ),
+                            TextSpan(
+                              text: ' ${l10n.attempts})',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ))
+                ),
+            ])
               : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -434,20 +575,21 @@ class _DashboardScreenState extends State<DashboardScreen>
                               arguments: [widget.user, widget.score, true]);
                         },
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(10.0),
-                          elevation:
-                              10.0, // Adjust the value to change the button shape
-                          shadowColor: Colors.black.withOpacity(
-                              0.4), // Adjust the shadow color and opacity
-                          splashFactory: InkRipple.splashFactory,
+                            padding: const EdgeInsets.all(10.0),
+                            elevation:
+                            10.0, // Adjust the value to change the button shape
+                            shadowColor: Colors.black.withOpacity(
+                                0.4), // Adjust the shadow color and opacity
+                            splashFactory: InkRipple.splashFactory,
+                            backgroundColor: Colors.blue
                         ),
-                        child: const SizedBox(
-                          width: 130.0,
-                          height: 40.0,
+                        child: SizedBox(
+                          width: (MediaQuery.of(context).size.width/2)-50,
+                          height: 50.0,
                           child: Center(
                             child: Text(
-                              'Practice With Guide',
-                              style: TextStyle(fontSize: 12.0),
+                              l10n.practice_guide,
+                              style: const TextStyle(fontSize: 15.0,color:Colors.white,fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
@@ -465,14 +607,15 @@ class _DashboardScreenState extends State<DashboardScreen>
                           shadowColor: Colors.black.withOpacity(
                               0.4), // Adjust the shadow color and opacity
                           splashFactory: InkRipple.splashFactory,
+                          backgroundColor: Colors.blue
                         ),
-                        child: const SizedBox(
-                          width: 130.0,
-                          height: 40.0,
+                        child:SizedBox(
+                          width: (MediaQuery.of(context).size.width/2)-50,
+                          height: 50.0,
                           child: Center(
                             child: Text(
-                              'Practice Without Guide',
-                              style: TextStyle(fontSize: 12.0),
+                              l10n.practice_without_guide,
+                              style: const TextStyle(fontSize: 15.0,color:Colors.white,fontWeight: FontWeight.bold),
                             ),
                           ),
                         ),
@@ -510,13 +653,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ],
                     ),
                     extraLinesData: ExtraLinesData(
-//         extraLinesOnTop: true,
+                      extraLinesOnTop: false,
                       horizontalLines: [
                         HorizontalLine(
                           y: 4,
                           color: const Color(0xFF3a6d70),
-                          strokeWidth: 2,
-                          dashArray: [5, 10],
+                          strokeWidth: 0,
+                          dashArray: [5,10],
                           label: HorizontalLineLabel(
                             show: true,
                             alignment: Alignment.topRight,
@@ -525,13 +668,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
-                            labelResolver: (line) => 'Excellent',
+                            labelResolver: (line) =>  l10n.comments_excellent,
                           ),
                         ),
                         HorizontalLine(
                           y: 2,
                           color: const Color(0xFFf6d797),
-                          strokeWidth: 2,
+                          strokeWidth: 0,
                           dashArray: [5, 10],
                           label: HorizontalLineLabel(
                             show: true,
@@ -541,13 +684,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
-                            labelResolver: (line) => 'Well done',
+                            labelResolver: (line) =>  l10n.comments_well_done,
                           ),
                         ),
                         HorizontalLine(
                           y: 0,
                           color: const Color(0xFF98463b),
-                          strokeWidth: 2,
+                          strokeWidth: 0,
                           dashArray: [5, 10],
                           label: HorizontalLineLabel(
                             show: true,
@@ -557,7 +700,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
-                            labelResolver: (line) => 'Can do better',
+                            labelResolver: (line) => l10n.comments_do_better,
                           ),
                         ),
                       ],
@@ -594,21 +737,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                         getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
                           return touchedBarSpots.map((barSpot) {
                             final flSpot = barSpot;
-                            if (flSpot.x == 0 || flSpot.x == 6) {
-                              return null;
-                            }
-
-                            TextAlign textAlign;
-                            switch (flSpot.x.toInt()) {
-                              case 1:
-                                textAlign = TextAlign.left;
-                                break;
-                              case 5:
-                                textAlign = TextAlign.right;
-                                break;
-                              default:
-                                textAlign = TextAlign.center;
-                            }
 
                             return LineTooltipItem(
                               '${widget.score![flSpot.x.toInt()].date} \n',
@@ -632,34 +760,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   ),
                                 ),
                               ],
-                              textAlign: textAlign,
+                              /*textAlign: textAlign,*/
                             );
                           }).toList();
                         },
                       ),
-                      /*touchCallback:
-                          (FlTouchEvent event, LineTouchResponse? lineTouch) {
-                        if (!event.isInterestedForInteractions ||
-                            lineTouch == null ||
-                            lineTouch.lineBarSpots == null) {
-                          setState(() {
-                            touchedValue = -1;
-                          });
-                          return;
-                        }
-                        final value = lineTouch.lineBarSpots![0].x;
 
-                        if (value == 0 || value == 6) {
-                          setState(() {
-                            touchedValue = -1;
-                          });
-                          return;
-                        }
-
-                        setState(() {
-                          touchedValue = value;
-                        });
-                      },*/
                     ),
                     titlesData: FlTitlesData(
                       leftTitles: AxisTitles(
@@ -714,6 +820,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                     ),
                     gridData: const FlGridData(
                       show: true,
+                      drawVerticalLine: false,
+                      drawHorizontalLine: false,
                     ),
                     borderData: FlBorderData(
                       show: true,

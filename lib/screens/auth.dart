@@ -6,6 +6,7 @@ import 'package:haigenie/screens/widgets/customTextField.dart';
 import 'package:haigenie/screens/registration.dart';
 import 'package:haigenie/screens/widgets/locale.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../services/VideoRecordingRepository.dart';
 import '../services/authRepository.dart';
 
@@ -29,7 +30,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
   bool _formIsValid = false;
   bool _isLoggingIn = false;
-  bool _privacyPolicyAccepted = false;
+  bool _privacyPolicyAccepted = true;
   late ScaffoldMessengerState _scaffoldMessenger;
   late NavigatorState navigator;
   late Locale _selectedLocale = const Locale('en');
@@ -149,26 +150,52 @@ class _LoginPageState extends State<LoginPage> {
                           controller: controllers[0],
                           validation: _validateForm,
                           label: '${l10n.email}*',
-                          icon: const Icon(Icons.person, color: Color(0xFF00a2d8)),
+                          icon: const Icon(Icons.person, color: Colors.blue),
                         ),
                         const SizedBox(height: 10.0),
                         CustomTextField(
                           controller: controllers[1],
                           validation: _validateForm,
                           label: '${l10n.password}*',
-                          icon: const Icon(Icons.lock, color: Color(0xFF00a2d8)),
+                          icon: const Icon(Icons.lock, color: Colors.blue),
                           obscurePassword: _obscurePassword,
                           iconButton: IconButton(
                             icon: Icon(
                               _obscurePassword
                                   ? Icons.visibility
                                   : Icons.visibility_off,
-                              color: const Color(0xFF00a2d8),
+                              color: Colors.blue,
                             ),
                             onPressed: _togglePasswordVisibility,
                           ),
                         ),
-                        const SizedBox(height: 20.0),
+                        const SizedBox(height: 5.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Checkbox(
+                              activeColor: Colors.blue,
+                              value: _privacyPolicyAccepted,
+                              onChanged: (value) {
+                                setState(() {
+                                  _privacyPolicyAccepted = value!;
+                                  _validateForm();
+                                });
+                              },
+                            ),
+                            Text(
+                              l10n.agree,
+                              style: const TextStyle(color: Colors.black,fontSize: 15),
+                            ),
+                            GestureDetector(
+                              onTap: (){
+                                launchUrl(Uri.parse("https://docs.google.com/document/d/1TU6SP4mLtb1uNDHEqunkOp_sI6X32qlXbDu1xXGkgT4/edit#heading=h.i78sxgh1hxdh"),mode:LaunchMode.externalNonBrowserApplication);
+                              },
+                                child:Text(" ${l10n.policy}",style: const TextStyle(color:Colors.blue,fontSize: 14),),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10.0),
                         ElevatedButton(
                           onPressed: _formIsValid
                               ? () => _login(_scaffoldMessenger, navigator)
@@ -180,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
                                 if (states.contains(MaterialState.disabled)) {
                                   return Colors.grey; // Disabled button color
                                 }
-                                return const Color(0xFF00a2d8); // Enabled button color
+                                return Colors.blue; // Enabled button color
                               },
                             ),
                           ),
@@ -208,35 +235,18 @@ class _LoginPageState extends State<LoginPage> {
                               onPressed: () {
                                 _showForgotPasswordPopUp(context);
                               },
-                              child: Text(l10n.forgotPassword),
+                              child: Text(l10n.forgotPassword,style: const TextStyle(color: Colors.blue),),
                             ),
                             TextButton(
                               onPressed: () {
-                                _showRegistrationPopup(context);
+                                // _showRegistrationPopup(context);
+                                launchUrl(Uri.parse("https://www.haigenie.datakalp.com/Register"),mode: LaunchMode.externalApplication);
                               },
-                              child: Text(l10n.register),
+                              child: Text(l10n.register,style: const TextStyle(color: Colors.blue),),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Checkbox(
-                              value: _privacyPolicyAccepted,
-                              onChanged: (value) {
-                                setState(() {
-                                  _privacyPolicyAccepted = value!;
-                                  _validateForm();
-                                });
-                              },
-                            ),
-                            Text(
-                              l10n.policy,
-                              style: const TextStyle(color: Colors.black),
-                            ),
-                          ],
-                        ),
+
                       ],
                     )),
               ),

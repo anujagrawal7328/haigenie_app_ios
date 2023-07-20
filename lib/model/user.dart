@@ -9,6 +9,7 @@ class User {
   bool? paid;
   String? userType;
   int? availableAttempts;
+  int? certificationAttempts;
 
   User({
     this.name,
@@ -21,6 +22,7 @@ class User {
     this.paid,
     this.userType,
     this.availableAttempts,
+    this.certificationAttempts
   });
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -33,7 +35,8 @@ class User {
         state: json['user_state'],
         userType: json['user_type'],
         paid:json['paid'],
-        availableAttempts: json['recordingsRemaining']);
+        availableAttempts: json['recordingsRemaining'],
+        certificationAttempts:json['certificationAttemptsRemaining']);
   }
   Map<String, dynamic> toJson() {
     return {
@@ -47,6 +50,7 @@ class User {
       'paid': paid,
       'user_type': userType,
       'recordingsRemaining': availableAttempts,
+      'certificationAttemptsRemaining': certificationAttempts
     };
   }
 }

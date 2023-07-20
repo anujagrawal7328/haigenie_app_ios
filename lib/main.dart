@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:haigenie/screens/account_deletion.dart';
 import 'package:haigenie/screens/auth.dart';
 import 'package:haigenie/screens/dashboard.dart';
 import 'package:haigenie/screens/guide.dart';
@@ -57,7 +58,6 @@ class MyAppState extends State<MyApp> {
   Object? _err;
   StreamSubscription? _sub;
   Locale? _currentLocale;
-
   String? storeVersion;
   PackageInfo _packageInfo = PackageInfo(
     appName: 'Unknown',
@@ -221,20 +221,33 @@ Future<void> getLocale() async {
       debugShowCheckedModeBanner: false,
       theme: lightTheme,
       routes: {
-        '/auth': (_) =>LoginPage(changeLocale: _changeLocale),
         '/guide': (_) => const GuidingVideoScreen(),
-        '/settings': (_) => SettingsPage(changeLocale:_changeLocale),
+        '/account_deletion':(_) => const AccountDeletionPage()
       },
       onGenerateRoute: (route) {
+        if(route.name =='/auth'){
+          return MaterialPageRoute(
+            builder: (context) => LoginPage(changeLocale: _changeLocale),
+          );
+        }
+        if(route.name =='/settings'){
+          final List<dynamic> arguments = route.arguments as List<dynamic>;
+          final User user = (route.arguments as List)[0] as User;
+          return MaterialPageRoute(
+            builder: (context) => SettingsPage(changeLocale:_changeLocale, user: user,),
+          );
+        }
         if(route.name =='/score'){
           final List<dynamic> arguments = route.arguments as List<dynamic>;
           final List<Score> score = (route.arguments as List)[0] as List<Score>;
           final User user = (route.arguments as List)[1] as User;
           final String video = (route.arguments as List)[2] as String;
+          final bool guide = (route.arguments as List)[3] as bool;
           return MaterialPageRoute(
             builder: (context) => ScoreView(
               video: video,
               user: user,
+            guide:guide,
             totalScore: '${score[0].totalScore!.toInt()}',
             totalTime: const Duration(seconds: 41),
             stepResults: [
@@ -309,7 +322,7 @@ Future<void> getLocale() async {
 
             if (snapshot.connectionState == ConnectionState.waiting) {
 
-              return const Scaffold(body:Center(child: CircularProgressIndicator(color: Color(0xFF00a2d8),)));
+              return const Scaffold(body:Center(child: CircularProgressIndicator(color: Colors.blue,)));
             } else if (snapshot.hasError) {
 
             } else if (snapshot.data != null) {
@@ -323,7 +336,7 @@ Future<void> getLocale() async {
             } else {
               return _packageInfo.version==storeVersion?LoginPage(changeLocale: _changeLocale):UpgradeAlert(child: LoginPage(changeLocale: _changeLocale),);
             }
-            return const Scaffold(body:Center(child: CircularProgressIndicator(color: Color(0xFF00a2d8),)));
+            return const Scaffold(body:Center(child: CircularProgressIndicator(color: Colors.blue,)));
           }),
            themeMode: ThemeMode.light,
     );
@@ -331,8 +344,8 @@ Future<void> getLocale() async {
   }
 
   Future<User?> verifyToken() async {
-    final user = await authRepository.verifyToken();
-    if (user != null) {
+     final user = await authRepository.verifyToken();
+    if (user!=null) {
       score = await recordingsRepository.lastScore();
       return user;
     } else {

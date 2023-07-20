@@ -190,7 +190,7 @@ class _RegistrationPopupState extends State<RegistrationPopup> {
                         (Set<MaterialState> states) {
                       if (!states.contains(MaterialState.disabled) &&
                           registrationFormIsValid) {
-                        return const Color(0xFF00a2d8); // Enabled button color
+                        return Colors.blue; // Enabled button color
                       }
                       return Colors.grey;
                     }),

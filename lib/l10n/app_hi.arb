@@ -1,44 +1,64 @@
 {
       "@@locale": "hi",
-      "landingPageHeading": "हेजिनी में आपका स्वागत है",
+       "email": "ईमेल",
+       "password" : "पासवर्ड",
+       "login" : "लॉगिन",
+       "forgotPassword" : "पासवर्ड भूल गए?",
+       "register": "रजिस्टर",
+       "agree" : "से सहमत हूं",
+       "policy": "गोपनीयता नीति और नियम शर्तों से।",
+       "fullName" : "पूरा नाम",
+       "organisation": "संगठन",
+       "mobileNumber": " व्हाट्सएप मोबाइल नंबर",
+       "dept": "विभाग",
+       "district": "जिला",
+       "state": "राज्य",
+       "country": "देश",
+       "india": "भारत",
+       "role" : "भूमिका",
+       "passwordReset" : "पासवर्ड रीसेट",
+       "reset" :"रीसेट",
+       "roleType": "{role,select ,admin{व्यवस्थापक} nurse{नर्स} pharmacist{फार्मासिस्ट} other{अन्य} doctor{डॉक्टर}}",
+                    "@roleType": {
+                      "description": "A roleType",
+                        "placeholders": {
+                          "role": {
+                            "type": "String"
+                          }
+                        }
+                      },
+      "landingPageHeading": "HAIgenie में आपका स्वागत है।",
       "@landingPageHeading": {
           "description": "Heading shown on the landing page."
       },
-      "guideVideo": "गाइड वीडियो चलाएं",
-      "@guideVideo": {
-          "description": "Guide Video Button Text"
-      },
+      "practice_mode": "अभ्यास मोड",
+         "@practice_mode": {
+             "description": "Practice Mode Button Text"
+         },
+      "start_assesment": " आप तैयार हैं? । मूल्यांकन शुरू करो",
       "attemptsRemaining": "प्रयास बाकी है",
       "@attemptsRemaining": {
           "description": "Number of attempts text"
       },
+      "practice_guide":"मार्गदर्शक के साथ",
+      "practice_without_guide":"मार्गदर्शक के  बिना",
       "yourPastScore": "आपका पिछला स्कोर",
       "haigenieScore": "हेजिनी स्कोर",
-      "email": "ईमेल",
-      "password" : "पासवर्ड",
-      "login" : "लॉगिन",
-      "forgotPassword" : "पासवर्ड भूल गए?",
-      "register": "रजिस्टर",
-      "policy" : "मैं गोपनीयता नीति से सहमत हूं",
-      "fullName" : "पूरा नाम",
-      "organisation": "संगठन",
-      "mobileNumber": " व्हाट्सएप मोबाइल नंबर",
-      "dept": "विभाग",
-      "district": "जिला",
-      "state": "राज्य",
-      "country": "देश",
-      "india": "भारत",
-      "role" : "भूमिका",
-      "passwordReset" : "पासवर्ड रीसेट",
-      "reset" :"रीसेट",
-      "roleType": "{role,select ,admin{व्यवस्थापक} nurse{नर्स} pharmacist{फार्मासिस्ट} other{अन्य} doctor{डॉक्टर}}",
-              "@roleType": {
-                "description": "A roleType",
-                  "placeholders": {
-                    "role": {
-                      "type": "String"
-                    }
-                  }
-                }
-
-  }
+      "screensvaer_title": "चलिए आपके HAIgenie स्कोर को जानते हैं।",
+      "screensaver_loading": "कृपया प्रतीक्षा करें... अच्छी चीजें समय लेती हैं।",
+      "guide_message_part_1": "मोबाइल फ़ोन को छत की ओर मुख करके",
+      "guide_message_part_2": "एक समतल सतह पर रखें",
+      "guide_message_part_3": "फिर यहाँ टैप करें।",
+      "motion_mimic_message": "कृपया दाईं ओर की नकल करे।",
+      "comments_excellent" : "शानदार। आप अन्य लोगों को सिखा सकते हैं",
+      "comments_well_done": "बहुत अच्छा।",
+      "comments_do_better": "आप बेहतर कर सकते हैं। ",
+      "only":"केवल",
+      "attempts":"मौके",
+      "palm_to_palm":"हथेली से हथेली",
+      "palm_to_dorsum":"हथेली से बाहरी सतह",
+      "fingers_interlaced":"उंगलियों के बीच",
+      "fist_interlocked":"बंद मुट्ठी के पीछे ",
+      "thumb_rub":"अंगूठे के सतह",
+      "palm_to_fingertips": "उंगलियों के टिप्स"
+}

@@ -1,25 +1,12 @@
 {
       "@@locale": "en",
-      "landingPageHeading": "Welcome to HAIgenie",
-      "@landingPageHeading": {
-          "description": "Heading shown on the landing page."
-      },
-      "guideVideo": "Play The Guide Video",
-      "@guideVideo": {
-          "description": "Guide Video Button Text"
-      },
-      "attemptsRemaining": "Attempts Remaining",
-      "@attemptsRemaining": {
-          "description": "Number of attempts text"
-      },
-      "yourPastScore": "Your Past Score",
-      "haigenieScore": "HAIgenie Score",
       "email": "Email",
       "password" : "Password",
       "login" : "Login",
       "forgotPassword" : "Forgot Password",
       "register": "Register",
-      "policy" : "I agree to the privacy policy",
+      "agree" : "I agree to the",
+      "policy": "privacy policy & terms condition",
       "fullName" : "Full Name",
       "organisation": "Organisation",
       "mobileNumber": " WhatsApp Mobile No.",
@@ -32,13 +19,48 @@
       "passwordReset": "Password Reset",
       "reset": "Reset",
       "roleType": "{role,select ,admin{Admin} nurse{Nurse} pharmacist{Pharmacist} other{Other} doctor{Doctor}}",
-        "@roleType": {
-          "description": "A roleType",
-            "placeholders": {
-              "role": {
-                "type": "String"
-              }
-            }
-          }
+              "@roleType": {
+                "description": "A roleType",
+                  "placeholders": {
+                    "role": {
+                      "type": "String"
+                    }
+                  }
+                },
+      "landingPageHeading": "Welcome to HAIgenie",
+      "@landingPageHeading": {
+          "description": "Heading shown on the landing page."
+      },
+      "practice_mode": "Practice Mode",
+      "@practice_mode": {
+          "description": "Practice Mode Button Text"
+      },
+      "start_assesment": "Ready? Start Assessment",
+      "attemptsRemaining": "Attempts Remaining",
+      "@attemptsRemaining": {
+          "description": "Number of attempts text"
+      },
+      "practice_guide":"Practice With Guide",
+      "practice_without_guide":"Practice Without Guide",
+      "yourPastScore": "Your Past Score",
+      "haigenieScore": "HAIgenie Score",
+      "screensvaer_title": "Lets find out your HAIgenie score!",
+      "screensaver_loading": "Please Wait ... Good things take time",
+      "guide_message_part_1": "Put mobile on a flat surface",
+      "guide_message_part_2": "facing ceiling and then",
+      "guide_message_part_3": "Tap Here",
+      "motion_mimic_message": "Please mimic the motion at the right",
+      "comments_excellent" : "Excellent। You can teach others !!",
+      "comments_well_done": "Well Done",
+      "comments_do_better": "Can do better",
+      "only":"only",
+      "attempts":"attempts",
+      "palm_to_palm":"Palm to Palm",
+      "palm_to_dorsum":"Palm to Dorsum",
+      "fingers_interlaced":"Fingers interlaced",
+      "fist_interlocked":"Fist Interlocked",
+      "thumb_rub":"Thumb Rub",
+      "palm_to_fingertips": "Palm to Fingertips"
+
 
 }

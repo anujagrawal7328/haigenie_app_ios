@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -103,4 +104,21 @@ class AuthRepository {
     prefs.clear();
     return true;
   }
+
+  Future<bool> deleteAccount() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final decode = JWT.decode(token!);
+    final url = Uri.parse('$baseUrl/users/${decode.payload['secret']}');
+    final headers = {'Content-Type': 'application/json'};
+    final response = await http.delete(url, headers: headers);
+    if (response.statusCode == 200) {
+      prefs.clear();
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+
 }

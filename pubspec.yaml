@@ -64,6 +64,8 @@ dependencies:
   audioplayers:
      path: packages/audioplayers/packages/audioplayers
   url_launcher: ^6.1.12
+  wakelock:
+     path: packages/wakelock/wakelock
 
 flutter_icons:
   android: "launcher_icon"
