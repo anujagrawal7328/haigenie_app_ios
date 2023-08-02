@@ -105,7 +105,7 @@ class AuthRepository {
     return true;
   }
 
-  Future<bool> deleteAccount() async {
+/*  Future<bool> deleteAccount() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final decode = JWT.decode(token!);
@@ -117,8 +117,65 @@ class AuthRepository {
       return true;
     }
     else{
+      print(response.body);
+      return false;
+    }
+  }*/
+  Future<bool> accountDeletion() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final url = Uri.parse('$baseUrl/deleteAccount');
+    final headers = {'Content-Type': 'application/json'};
+    final body = json.encode({'jwtToken': token});
+    final response = await http.post(url, headers: headers,body: body);
+    if (response.statusCode == 200) {
+      return true;
+    }
+    else{
+      print(response.body);
+      return false;
+    }
+  }
+  Future<bool> deleteAccountAuthentication(String email,String token) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final url = Uri.parse('$baseUrl/deleteAccountAuthentication');
+    final headers = {'Content-Type': 'application/json'};
+    final body = json.encode({'email':email,'token': token});
+    final response = await http.delete(url, headers: headers,body: body);
+    if (response.statusCode == 200) {
+      prefs.clear();
+      return true;
+    }
+    else{
+      print(response.body);
+      return false;
+    }
+  }
+  Future<bool> resetPassword(String email) async {
+    final url = Uri.parse('$baseUrl/resetPassword');
+    final headers = {'Content-Type': 'application/json'};
+    final body = json.encode({'email': email});
+    final response = await http.post(url, headers: headers,body: body);
+    if (response.statusCode == 200) {
+      return true;
+    }
+    else{
+      print(response.body);
       return false;
     }
   }
 
+  Future<bool> resetPasswordAuthentication(String email,String password,String token) async {
+    final url = Uri.parse('$baseUrl/resetPasswordAuthentication');
+    final headers = {'Content-Type': 'application/json'};
+    final body = json.encode({'email':email,'token': token,'password':password});
+    final response = await http.post(url, headers: headers,body: body);
+    if (response.statusCode == 200) {
+      return true;
+    }
+    else{
+      print(response.body);
+      return false;
+    }
+  }
 }

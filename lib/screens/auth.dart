@@ -239,8 +239,8 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             TextButton(
                               onPressed: () {
-                                // _showRegistrationPopup(context);
-                                launchUrl(Uri.parse("https://www.haigenie.datakalp.com/Register"),mode: LaunchMode.externalApplication);
+                                _showRegistrationPopup(context);
+                               // launchUrl(Uri.parse("https://www.haigenie.datakalp.com/Register"),mode: LaunchMode.externalApplication);
                               },
                               child: Text(l10n.register,style: const TextStyle(color: Colors.blue),),
                             ),

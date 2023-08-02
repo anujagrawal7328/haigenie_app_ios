@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,8 +10,10 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:haigenie/screens/account_deletion.dart';
 import 'package:haigenie/screens/auth.dart';
 import 'package:haigenie/screens/dashboard.dart';
+import 'package:haigenie/screens/deleteAccount.dart';
 import 'package:haigenie/screens/guide.dart';
 import 'package:haigenie/screens/recorder.dart';
+import 'package:haigenie/screens/resetPassword.dart';
 import 'package:haigenie/screens/settings.dart';
 import 'package:haigenie/screens/updatePassword.dart';
 import 'package:haigenie/screens/score.dart';
@@ -35,7 +38,11 @@ Future<void> main() async {
   ));
   setupLocator();
 
-  runApp(const MyApp());
+  runApp(DevicePreview(enabled:!kReleaseMode,
+  builder: (context)=> const MyApp()
+  ),
+  );
+  // runApp( const MyApp());
 }
 
 bool _initialUriIsHandled = false;
@@ -329,10 +336,22 @@ Future<void> getLocale() async {
               return _packageInfo.version==storeVersion?snapshot.data?.userType=='multiuser'?VideoRecordingScreen(user: snapshot.data!,score: score,guide:true):DashboardScreen(user:snapshot.data!,score: score):
               UpgradeAlert(child: snapshot.data?.userType=='multiuser'?VideoRecordingScreen(user: snapshot.data!,score: score,guide:true):DashboardScreen(user:snapshot.data!,score: score),);
             } else if (_initialUri != null) {
-
+              String type = _initialUri!.pathSegments[0];
               String email = _initialUri!.pathSegments[1];
               String token = _initialUri!.pathSegments[2];
-              return UpdatePassword(email:email,token:token);
+              if(type=="verify"){
+                print(1);
+                return UpdatePassword(email:email,token:token);
+              }
+              if(type=="reset"){
+                print(2);
+                return ResetPassword(email:email,token:token);
+              }
+              if(type=="delete"){
+                print(3);
+                return DeleteAccount(email:email,token:token);
+              }
+
             } else {
               return _packageInfo.version==storeVersion?LoginPage(changeLocale: _changeLocale):UpgradeAlert(child: LoginPage(changeLocale: _changeLocale),);
             }

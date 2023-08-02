@@ -14,6 +14,7 @@ class _AccountDeletionPageState extends State<AccountDeletionPage> {
   bool _consentChecked = false;
   final AuthRepository authRepository = AuthRepository();
   bool isDeleting=false;
+  late ScaffoldMessengerState _scaffoldMessenger;
   @override
   void initState() {
     super.initState();
@@ -26,18 +27,20 @@ class _AccountDeletionPageState extends State<AccountDeletionPage> {
     super.dispose();
   }
 
-  Future<void> submitAccountDeletionRequest(BuildContext context) async {
+  Future<void> submitAccountDeletionRequest(BuildContext context,ScaffoldMessengerState scaffoldMessenger) async {
     setState(() {
       isDeleting=true;
     });
-    final result = await authRepository.deleteAccount();
-      /*String deletionReason = _reasonController.text;*/
+    final result = await authRepository.accountDeletion();
     if (result == true) {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/auth', // Replace with the route name for your login screen
-          ModalRoute.withName('/auth'), // Remove all existing routes from the stack
-      );
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text(
+            'confirmation link sent on email ',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.green,
+        ),);
       }else{
       setState(() {
         isDeleting=false;
@@ -47,6 +50,7 @@ class _AccountDeletionPageState extends State<AccountDeletionPage> {
 
   @override
   Widget build(BuildContext context) {
+    _scaffoldMessenger = ScaffoldMessenger.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Account Deletion Request'),
@@ -88,7 +92,7 @@ class _AccountDeletionPageState extends State<AccountDeletionPage> {
             ),
             const SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed:_consentChecked==true?() =>submitAccountDeletionRequest(context):null,
+              onPressed:_consentChecked==true?() =>submitAccountDeletionRequest(context,_scaffoldMessenger):null,
               style: ButtonStyle(
                 backgroundColor:
                 MaterialStateProperty.resolveWith<Color>(

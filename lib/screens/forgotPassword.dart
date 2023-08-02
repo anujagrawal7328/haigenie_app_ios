@@ -43,28 +43,28 @@ class _ForgotPasswordPopupState extends State<ForgotPasswordPopup> {
     String email = controllers[0].text;
 
     if(email.isNotEmpty){
-     /* final registered = await authRepository.register(email);
-      if (registered) {
+      final reset = await authRepository.resetPassword(email);
+      if (reset) {
         scaffoldMessenger.showSnackBar(
           const SnackBar(
             content: Text(
-              'A verification mail sent on your email',
+              'A reset password link sent to your mail',
               style: TextStyle(color: Colors.white),
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.green,
           ),
         );
       } else {
         scaffoldMessenger.showSnackBar(
           const SnackBar(
             content: Text(
-              'Registration Failure',
+              'Invalid Request',
               style: TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.red,
           ),
         );
-      }*/
+      }
     }
   }
   @override

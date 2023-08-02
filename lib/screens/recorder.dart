@@ -59,6 +59,7 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
   late Duration _duration;
   late String _remainingTime;
   final AudioPlayer audioPlayer = AudioPlayer();
+  late AppLifecycleState _appLifecycleState;
   final List<String> _imageUrlsEN = [
     'assets/Images/Screensaver/Screensaver_English/screensaver_6.png',
     'assets/Images/Screensaver/Screensaver_English/hand.png',
@@ -81,7 +82,12 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
   @override
   void initState() {
     super.initState();
-    Wakelock.disable();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    WidgetsBinding.instance.addObserver(this);
+    Wakelock.enable();
     SchedulerBinding.instance.addPostFrameCallback((_) {
       final currentLocale = Localizations.localeOf(context);
       setState(() {
@@ -136,6 +142,28 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
     }
   }
 
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    setState(() {
+      _appLifecycleState = state;
+    });
+    if(state == AppLifecycleState.paused) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+    }
+    if(state == AppLifecycleState.resumed) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+    }
+    print('AppLifecycleState state:  $state');
+  }
+
+
   @override
   void dispose() {
     _timer.cancel();
@@ -145,7 +173,8 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
     _modelInferenceService.inferenceResults = null;
     _controller.dispose();
     audioPlayer.dispose();
-    Wakelock.enable();
+    Wakelock.disable();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -189,7 +218,8 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
     try {
       await _cameraController!.initialize().then((value) async {
         if (!mounted) return;
-        await _cameraController?.unlockCaptureOrientation();
+
+/*        await _cameraController?.lockCaptureOrientation(DeviceOrientation.landscapeLeft);*/
       });
     } on CameraException catch (e) {
       _showInSnackBar('Error: ${e.code}\n${e.description}');
@@ -311,12 +341,7 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
     final l10n = context.l10n;
     if (_isComputing) audioPlayer.play(AssetSource('audios/Music_3.mp3'));
 
-    return OrientationBuilder(builder: (context, orientation) {
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]);
-      return Scaffold(
+    return  Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
           title:
@@ -373,50 +398,47 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
           ],
         ),
         body: !_isComputing
-            ? Row(
+            ? SafeArea(child:Container(
+          margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+          height: MediaQuery.of(context).size.height * 0.70,
+          child:Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Expanded(
-                    flex: 1,
-                    child: Padding(
+                  Padding(
                       padding: const EdgeInsets.all(
                           1.0), // Adjust the margin as needed
                       child: _isLoading
                           ? _buildLoadingIndicator()
                           : _buildCameraPreview(),
                     ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Padding(
+                  // const SizedBox(width: 80,),
+                  Padding(
                       padding: const EdgeInsets.all(
                           1.0), // Adjust the margin as needed
                       child: widget.guide == true
                           ? _buildVideoPlayer()
                           : Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildGenieImage(),
                                 const SizedBox(width: 5.0),
                                 Column(children: [
-                                  const SizedBox(height: 40.0),
+                                  const SizedBox(height: 10.0),
                                   _buildTimer(),
-                                  const SizedBox(height: 20.0),
+                                  const SizedBox(height: 10.0),
                                   _buildStepsBox()
                                 ]),
                               ],
                             ),
                     ),
-                  ),
                 ],
-              )
-            : Stack(children: [
-                Positioned(
-                  top: 10,
-                  left: 0,
-                  right: 0,
-                  child: Container(
+              )))
+            : Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+                 Container(
                     color: Colors.blue,
-                    height: 30,
+                    height: MediaQuery.of(context).size.height*0.12,
                     child: Center(
                       child: Text(
                         l10n.screensvaer_title,
@@ -427,67 +449,37 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
                       ),
                     ),
                   ),
-                ),
-                Positioned(
-                    top: 50,
-                    left: 10,
-                    right: 10,
-                    child: SizedBox(
-                        width: MediaQuery.of(context).size.height - 180,
-                        height: MediaQuery.of(context).size.height - 180,
+              SizedBox(height: MediaQuery.of(context).size.height*0.010,),
+                 SizedBox(
+                        height: MediaQuery.of(context).size.height*0.50,
                         child: AnimatedSwitcher(
                           duration: const Duration(seconds: 1),
                           child: Image.asset(
                               _selectedLocale == const Locale('en')
                                   ? _imageUrlsEN[_currentIndex]
                                   : _imageUrlsHI[_currentIndex]),
-                        ))),
-                Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: 25,
+                        )),
+                SizedBox(height: MediaQuery.of(context).size.height*0.010,),
+                 Container(
+                      height: MediaQuery.of(context).size.height*0.12,
                       color: Colors.blue,
                       child: Center(
                           child: Text(
                         l10n.screensaver_loading,
                         style: const TextStyle(color: Colors.white),
                       )),
-                    )),
+                    ),
               ]),
-        /* bottomNavigationBar: !_isComputing
-          ? Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: widget.user.userType != 'multiuser'
-                  ? ElevatedButton(
-                      onPressed: () {
-                        if (widget.user.availableAttempts! > 0 ||
-                            widget.user.paid == true) {
-                          final file = File(videoFile.path);
-                          if (_isRecording) {
-                            _showInSnackBar("Still recording please wait.. ");
-                          } else if (!file.existsSync()) {
-                            _showInSnackBar("Please record a video first! ");
-                          } else {
-                            _isComputing = true;
-                            _submitRecordedVideo(videoFile.path);
-                          }
-                        } else {
-                          _showInSnackBar("You have 0 attempts left!");
-                        }
-                      },
-                      child: const Text('Know Your HAIgenie Score'))
-                  : null,
-            )
-          : null,*/
+
       );
-    });
-  }
+    }
 
   Widget _buildTimer() {
-    return Container(
+    return Stack(
+        children: [SizedBox(
+    width: MediaQuery.of(context).size.width * 0.24,
+    // height: 210,
+    child: Container(
       padding: const EdgeInsets.all(25.0),
       decoration: BoxDecoration(
         color: Colors.blue,
@@ -495,7 +487,7 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
       ),
       child: _remainingTime != ""
           ? Text(
-              '00:00:$_remainingTime',
+              '00:00:$_remainingTime',textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 24.0,
                 fontWeight: FontWeight.bold,
@@ -503,21 +495,24 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
               ),
             )
           : const Text(
-              '00:00:00',
+              '00:00:00',textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 24.0,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
-    );
+    ))]);
   }
 
   Widget _buildStepsBox() {
     final l10n = context.l10n;
-    return Container(
+    return Stack(
+        children: [SizedBox(
+    width: MediaQuery.of(context).size.width * 0.24,
+    // height: 210,
+    child:Container(
       height: 100,
-      width: 150,
       padding: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -613,27 +608,27 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
                                         ),
                                       ),
       ]),
-    );
+    ))]);
   }
 
   Widget _buildGenieImage() {
-    // Replace this with your actual genie image widget
-    return Image.asset("assets/Images/Genie.jpeg", width: 250, height: 250);
+    return
+      Stack(
+          children: [SizedBox(
+      width: MediaQuery.of(context).size.width * 0.22,
+    // height: 210,
+    child:Image.asset("assets/Images/Genie.jpeg"))]);
   }
 
   Widget _buildVideoPlayer() {
-    // Replace this with your actual video player widget
-    return Stack(children: [
-      Positioned(
-          top: 20,
-          left: 40,
-          right: 20,
-          bottom: 20,
-          child: AspectRatio(
-            aspectRatio: 1.33,
-            child: VideoPlayer(_controller),
-          ))
-    ]);
+    return Stack(
+        children: [SizedBox(
+        width: MediaQuery.of(context).size.width * 0.40,
+        // height: 210,
+        child: AspectRatio(
+          aspectRatio: 1.33,
+          child: VideoPlayer(_controller),
+        ))]);
   }
 
   Widget _buildCameraPreview() {
@@ -658,10 +653,9 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
           });
           await audioPlayer.stop();
           await _controller.seekTo(Duration.zero);
-          await _controller.play();
-          await _cameraController?.prepareForVideoRecording();
-          await _cameraController?.startVideoRecording();
-          setState(() {});
+          _controller.play();
+          _cameraController?.prepareForVideoRecording();
+          _cameraController?.startVideoRecording();
           _timer = PausableTimer(const Duration(seconds: 41), () async {
             setState(() {
               _isRecording = false;
@@ -685,37 +679,29 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
       child: Stack(
         children: [
           _isRecording
-              ? Positioned(
-                  top: 20,
-                  left: 40,
-                  right: 10,
-                  bottom: 20,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                      border: Border.all(color: Colors.green, width: 5),
-                    ),
-                    child: AspectRatio(
-                        aspectRatio: 1.33,
-                        child: CameraPreview(_cameraController!)),
+              ?SizedBox(
+      width: MediaQuery.of(context).size.width * 0.40,
+        // height: 210,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.green,
+            border: Border.all(color: Colors.green, width: 5),
+          ),
+          child: AspectRatio(
+              aspectRatio: 1.33,
+              child: CameraPreview(_cameraController!)),
+        ),) :SizedBox(
+              width: MediaQuery.of(context).size.width * 0.40,
+              // height: 210,
+              child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    border: Border.all(color: Colors.red, width: 5),
                   ),
-                )
-              : Positioned(
-                  top: 20,
-                  left: 40,
-                  right: 10,
-                  bottom: 20,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      border: Border.all(color: Colors.red, width: 5),
-                    ),
-                    child: AspectRatio(
-                        aspectRatio: 1.33,
-                        child: CameraPreview(_cameraController!)),
-                  ),
-                ),
-
+                  child: AspectRatio(
+                      aspectRatio: 1.33,
+                      child: CameraPreview(_cameraController!)),
+              ),),
           /* Visibility(
             visible: _draw,
             child: IndexedStack(
@@ -728,12 +714,11 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
           if (_isRecording)
             widget.guide == false
                 ? Container()
-                : Positioned(
-                    top: 30,
-                    left: 60,
-                    right: 40,
+                : SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.35,
                     child: Container(
                       height: 40.0,
+                      margin:EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.05, MediaQuery.of(context).size.width * 0.02, 0.0, 0.0),
                       decoration: BoxDecoration(
                         color: Colors.blue,
                         borderRadius: BorderRadius.circular(5),
@@ -750,12 +735,11 @@ class _VideoRecordingScreenState extends State<VideoRecordingScreen>
                     ),
                   ),
           if (!_isRecording)
-            Positioned(
-                top: 30,
-                left: 60,
-                right: 40,
+            SizedBox(
+                width: MediaQuery.of(context).size.width * 0.35,
                 child: Container(
                   height: 60.0,
+                  margin:EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.05, MediaQuery.of(context).size.width * 0.02, 0.0, 0.0),
                   decoration: BoxDecoration(
                     color: Colors.blue,
                     borderRadius: BorderRadius.circular(5),

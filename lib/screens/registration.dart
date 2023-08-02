@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:haigenie/l10n/l10n.dart';
 
@@ -58,7 +60,14 @@ class _RegistrationPopupState extends State<RegistrationPopup> {
        && district.isNotEmpty
        && state.isNotEmpty
        && whatsApp.isNotEmpty){
-     final user=User(name: name,organisation: organisation,email: email,whatsappNo: whatsApp,department: dept,district: district,state: state,userType: 'practice');
+     String device_type="other";
+     if(Platform.isAndroid){
+       device_type="Android";
+     }
+     if(Platform.isIOS){
+       device_type="IOS";
+     }
+     final user=User(name: name,organisation: organisation,email: email,whatsappNo: whatsApp,department: dept,district: district,state: state,userType: 'practice',device_type: device_type,userRole: role);
     final registered = await authRepository.register(user);
     if (registered) {
       scaffoldMessenger.showSnackBar(

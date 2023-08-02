@@ -5,15 +5,15 @@ import '../services/authRepository.dart';
 List<TextEditingController> createControllers(int count) {
   return List<TextEditingController>.generate(count, (_) => TextEditingController());
 }
-class UpdatePassword extends StatefulWidget {
+class ResetPassword extends StatefulWidget {
   final String? email;
   final String? token;
-  const UpdatePassword({super.key,required this.email,required this.token});
+  const ResetPassword({super.key,required this.email,required this.token});
   @override
-  State<StatefulWidget> createState() => _UpdatePasswordState();
+  State<StatefulWidget> createState() => _ResetPasswordState();
 }
 
-class _UpdatePasswordState extends State<UpdatePassword> {
+class _ResetPasswordState extends State<ResetPassword> {
   late List<TextEditingController> controllers;
 
   final AuthRepository authRepository = AuthRepository();
@@ -47,21 +47,21 @@ class _UpdatePasswordState extends State<UpdatePassword> {
     });
   }
 
-  Future<void> update(ScaffoldMessengerState scaffoldMessenger) async {
+  Future<void> reset(ScaffoldMessengerState scaffoldMessenger) async {
     String password = controllers[0].text;
     String email = controllers[2].text;
     String token = widget.token!;
-    final isUpdated = await authRepository.updateNewUser(email,password,token);
+    final isUpdated = await authRepository.resetPasswordAuthentication(email,password,token);
     if (isUpdated) {
       Navigator.pushReplacementNamed(context, '/auth');
       scaffoldMessenger.showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Success',
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Colors.green,
-          ),);
+        const SnackBar(
+          content: Text(
+            'Reset Password Sucessfully',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.green,
+        ),);
     } else {
       scaffoldMessenger.showSnackBar(
         const SnackBar(
@@ -72,7 +72,7 @@ class _UpdatePasswordState extends State<UpdatePassword> {
           backgroundColor: Colors.red,
         ),
       );
-     }
+    }
   }
 
   @override
@@ -143,7 +143,7 @@ class _UpdatePasswordState extends State<UpdatePassword> {
               const SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed:
-                _formIsValid ? () => update(_scaffoldMessenger) : null,
+                _formIsValid ? () => reset(_scaffoldMessenger) : null,
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.resolveWith<Color>(
                         (Set<MaterialState> states) {

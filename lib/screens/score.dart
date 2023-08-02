@@ -54,6 +54,10 @@ class _ScoreViewState extends State<ScoreView> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     SchedulerBinding.instance.addPostFrameCallback((_) {
       final currentLocale = Localizations.localeOf(context);
       setState(() {
@@ -67,15 +71,20 @@ class _ScoreViewState extends State<ScoreView> {
       _controller.initialize().then((_) {
         setState(() {});
       });
-      _selectedLocale == const Locale('en')?int.parse(widget.totalScore) == 6
-          ? audioPlayer.play(AssetSource("audios/Score-5-6 excellent teach others too.mp3"))
-          : int.parse(widget.totalScore) > 2
-          ? audioPlayer.play(AssetSource("audios/Well_done.m4a"))
-          : audioPlayer.play(AssetSource("audios/Can_do_better.m4a")):int.parse(widget.totalScore) == 6
-          ? audioPlayer.play(AssetSource("audios/Score 5-6.mp3"))
-          : int.parse(widget.totalScore) > 2
-          ? audioPlayer.play(AssetSource("audios/Score 3-4 bahut acha.mp3"))
-          : audioPlayer.play(AssetSource("audios/Score-1-2behtar karsakte hai.mp3"));
+      _selectedLocale == const Locale('en')
+          ? int.parse(widget.totalScore) == 6
+              ? audioPlayer.play(AssetSource(
+                  "audios/Score-5-6 excellent teach others too.mp3"))
+              : int.parse(widget.totalScore) > 2
+                  ? audioPlayer.play(AssetSource("audios/Well_done.m4a"))
+                  : audioPlayer.play(AssetSource("audios/Can_do_better.m4a"))
+          : int.parse(widget.totalScore) == 6
+              ? audioPlayer.play(AssetSource("audios/Score_5-6.mp3"))
+              : int.parse(widget.totalScore) > 2
+                  ? audioPlayer
+                      .play(AssetSource("audios/Score_3-4_bahut_acha.mp3"))
+                  : audioPlayer.play(
+                      AssetSource("audios/Score-1-2behtar_karsakte_hai.mp3"));
       print('Current Locale: $currentLocale');
     });
     _controller2 = VideoPlayerController.file(File(widget.video),
@@ -94,7 +103,6 @@ class _ScoreViewState extends State<ScoreView> {
     updateScoreList();
     _duration = const Duration(seconds: 41);
     _remainingTime = formatDuration(_duration);
-
   }
 
   String formatDuration(Duration duration) {
@@ -128,13 +136,8 @@ class _ScoreViewState extends State<ScoreView> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return OrientationBuilder(builder: (context, orientation) {
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]);
-      return Scaffold(
-        appBar: AppBar(
+    return Scaffold(
+        /* appBar: AppBar(
           backgroundColor: Colors.white,
           // leading:
           //     Image.asset("assets/Images/app_icon.png", width: 50, height: 50),
@@ -159,129 +162,169 @@ class _ScoreViewState extends State<ScoreView> {
               ),
             ]),
           ),
-        ),
-        body: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: Column(
-            //   crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                margin: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                          1.0,1,1,1), // Adjust the margin as needed
-                      child: _buildVideoPlayer2(),
+        ),*/
+        body: SafeArea(
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            SizedBox(
+                height: MediaQuery.of(context).size.height * 0.10,
+                child: Center(
+                    child: RichText(
+                  // textAlign: TextAlign.center,
+                  text: TextSpan(children: [
+                    TextSpan(
+                      text: int.parse(widget.totalScore) > 4
+                          ? "${l10n.comments_excellent}\n"
+                          : int.parse(widget.totalScore) > 2
+                              ? "${l10n.comments_well_done}\n"
+                              : "${l10n.comments_do_better}\n",
+                      style: TextStyle(
+                          color: int.parse(widget.totalScore) > 4
+                              ? const Color(0xFF3a6d70)
+                              : int.parse(widget.totalScore) > 2
+                                  ? const Color(0xFFf6d797)
+                                  : const Color(0xFF98463b),
+                          fontSize: 21,
+                          fontWeight: FontWeight.bold),
                     ),
-                    Padding(
+                  ]),
+                ))),
+            Container(
+              margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              height: MediaQuery.of(context).size.height * 0.60,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(
+                        5.0), // Adjust the margin as needed
+                    child: _buildVideoPlayer2(),
+                  ),
+                  Padding(
                       padding: const EdgeInsets.all(
                           1.0), // Adjust the margin as needed
-                      child: Column(
-                        children: [
-                          Image.asset("assets/Images/app_icon.png",
-                              width: 50, height: 50),
-                          RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(children: [
-                              const TextSpan(
-                                text: 'HAIgenie Score \n',
-                                style: TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              TextSpan(
-                                text: '${widget.totalScore}/6',
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.20,
+                        child: Column(
+                          children: [
+                            Image.asset("assets/Images/app_icon.png",
+                                width: MediaQuery.of(context).size.width * 0.06),
+                            RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(children: [
+                               TextSpan(
+                                  text: 'HAIgenie Score \n',
+                                  style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: MediaQuery.of(context).size.width * 0.02,
+                                      fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                            ]),
-                          ),
-                          IconButton(
-                            onPressed: () async {
-                              if (_controller.value.isPlaying &&
-                                  _controller2.value.isPlaying) {
-                                _controller.pause();
-                                _controller2.pause();
-                                timer.cancel();
-                              } else {
-                                _controller2.play();
-                                _controller.play();
-                                startTimer();
-                              }
-                              setState(() {});
-                            },
-                            icon: Icon(
-                              (_controller.value.isPlaying &&
-                                      _controller2.value.isPlaying)
-                                  ? Icons.pause
-                                  : Icons.play_arrow,
-                              size: 40,
+                                TextSpan(
+                                  text: '${widget.totalScore}/6',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: MediaQuery.of(context).size.width * 0.02,
+                                  ),
+                                ),
+                              ]),
                             ),
-                          ),
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                IconButton(
-                                    onPressed: () {
-                                      widget.guide==true?()
-                                      {widget.user.availableAttempts =
-                                          widget.user.availableAttempts! - 1;
-                                      Navigator.of(context).pushReplacementNamed(
-                                          '/dashboard',
-                                          arguments: [widget.user, score]);}:()
-                                      {widget.user.certificationAttempts =
-                                          widget.user.certificationAttempts! - 1;
-                                      Navigator.of(context).pushReplacementNamed(
-                                          '/dashboard',
-                                          arguments: [widget.user, score]);};
-                                    },
-                                    icon: const Icon(
-                                      Icons.home,
-                                      size: 30,
-                                    )),
-                                IconButton(
-                                    onPressed: () {
-                                      if (volumeUp) {
-                                        volumeUp = false;
-                                        _controller.setVolume(0.0);
-                                        setState(() {});
-                                      } else {
-                                        volumeUp = true;
-                                        _controller.setVolume(50.0);
-                                        setState(() {});
-                                      }
-                                    },
-                                    icon: volumeUp
-                                        ? const Icon(
-                                            Icons.volume_up,
-                                            size: 30,
-                                          )
-                                        : const Icon(
-                                            Icons.volume_off,
-                                            size: 30,
-                                          )),
-                              ])
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(
-                          1.0), // Adjust the margin as needed
-                      child: _buildVideoPlayer(),
-                    ),
-                  ],
-                ),
+                            IconButton(
+                              onPressed: () async {
+                                if (_controller.value.isPlaying &&
+                                    _controller2.value.isPlaying) {
+                                  _controller.pause();
+                                  _controller2.pause();
+                                  timer.cancel();
+                                } else {
+                                  _controller2.play();
+                                  _controller.play();
+                                  startTimer();
+                                }
+                                setState(() {});
+                              },
+                              icon: Icon(
+                                (_controller.value.isPlaying &&
+                                        _controller2.value.isPlaying)
+                                    ? Icons.pause
+                                    : Icons.play_arrow,
+                                size: MediaQuery.of(context).size.width * 0.05,
+                              ),
+                            ),
+                            Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  IconButton(
+                                      onPressed: () {
+                                        if (widget.guide == true) {
+                                          widget.user.availableAttempts =
+                                              widget.user.availableAttempts! -
+                                                  1;
+                                          Navigator.of(context)
+                                              .pushReplacementNamed(
+                                                  '/dashboard',
+                                                  arguments: [
+                                                widget.user,
+                                                score
+                                              ]);
+                                        } else {
+                                          widget.user.certificationAttempts =
+                                              widget.user
+                                                      .certificationAttempts! -
+                                                  1;
+                                          Navigator.of(context)
+                                              .pushReplacementNamed(
+                                                  '/dashboard',
+                                                  arguments: [
+                                                widget.user,
+                                                score
+                                              ]);
+                                        }
+                                      },
+                                      icon:  Icon(
+                                        Icons.home,
+                                        size: MediaQuery.of(context).size.width * 0.04,
+                                      )),
+                                  IconButton(
+                                      onPressed: () {
+                                        if (volumeUp) {
+                                          volumeUp = false;
+                                          _controller.setVolume(0.0);
+                                          setState(() {});
+                                        } else {
+                                          volumeUp = true;
+                                          _controller.setVolume(50.0);
+                                          setState(() {});
+                                        }
+                                      },
+                                      icon: volumeUp
+                                          ? Icon(
+                                              Icons.volume_up,
+                                              size: MediaQuery.of(context).size.width * 0.04,
+                                            )
+                                          : Icon(
+                                              Icons.volume_off,
+                                              size: MediaQuery.of(context).size.width * 0.04,
+                                            )),
+                                ])
+                          ],
+                        ),
+                      )),
+                  Padding(
+                    padding: const EdgeInsets.all(
+                        5.0), // Adjust the margin as needed
+                    child: _buildVideoPlayer(),
+                  ),
+                ],
               ),
-              /*    int.parse(_remainingTime) < 41 &&
+            ),
+            /*    int.parse(_remainingTime) < 41 &&
                       int.parse(_remainingTime) != 00 &&
                       int.parse(_remainingTime) != 41
                   ? Expanded(
@@ -374,90 +417,72 @@ class _ScoreViewState extends State<ScoreView> {
                         },
                       ))
                   :*/
-              Container(
-                height: MediaQuery.of(context).size.height*0.18,
-                //width: 200,
-                padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: gifUrls.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 6, // Number of columns
-                    mainAxisSpacing: 0,
-                    crossAxisSpacing: 50,
-                  ),
-                  itemBuilder: (context, index) {
-                    return Stack(
-                      children: [
-                        Image.asset(
-                          gifUrls[index],
-                        ),
-                        Positioned(
-                          top: 0,
-                          right: 0,
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              '${index + 1}',
-                              style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 30,
-                          bottom: 30,
-                          right: 30,
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: widget.stepResults[index].isVerified
-                                ? Image.asset(
-                                    'assets/Images/Feedback/greentick.png',
-                                  )
-                                : Image.asset(
-                                    'assets/Images/Feedback/redcross.png'),
-                          ),
-                        )
-                      ],
-                    );
-                  },
+            Container(
+              height: MediaQuery.of(context).size.height * 0.23,
+              padding: const EdgeInsets.fromLTRB(10, 0, 10,0),
+              child: GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: gifUrls.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 6, // Number of columns
+                  mainAxisSpacing: 0,
+                  crossAxisSpacing: 0,
                 ),
+                itemBuilder: (context, index) {
+                  return Stack(
+                    children: [
+                      Image.asset(
+                        gifUrls[index]
+                      ),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            '${index + 1}',
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      Center(
+                        child: Container(
+                            height: MediaQuery.of(context).size.height * 0.13,
+                          padding: const EdgeInsets.all(10),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                            child: widget.stepResults[index].isVerified
+                              ? Image.asset(
+                                  'assets/Images/Feedback/greentick.png',
+                                )
+                              : Image.asset(
+                                  'assets/Images/Feedback/redcross.png',)
+                        ),
+                      )
+                    ],
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
-    });
+      ),
+    ));
   }
 
   Widget _buildVideoPlayer() {
-    // Replace this with your actual video player widget
-    /*return Stack(children: [
-      Positioned(
-          left: 25,
-          bottom: 10,
-          child: SizedBox(
-              width: 320,
-              height: 210,
-              child: AspectRatio(
-                aspectRatio: 1.33,
-                child: VideoPlayer(_controller),
-              )))
-    ]);*/
-
     return SizedBox(
-        width: MediaQuery.of(context).size.width*0.35,
-       // height: 210,
+        width: MediaQuery.of(context).size.width * 0.30,
+        // height: 210,
         child: AspectRatio(
           aspectRatio: 1.33,
           child: VideoPlayer(_controller),
@@ -465,24 +490,8 @@ class _ScoreViewState extends State<ScoreView> {
   }
 
   Widget _buildVideoPlayer2() {
-    // Replace this with your actual video player widget
-    /*return Stack(children: [
-      Positioned(
-          right: 25,
-          bottom: 10,
-          child: SizedBox(
-              width: 320,
-              height: 210,
-              child: AspectRatio(
-                aspectRatio: 1.33,
-                child: VideoPlayer(_controller2),
-              )))
-
-    ]);*/
-
     return SizedBox(
-        width: MediaQuery.of(context).size.width*0.35,
-        //height: MediaQuery.of(context).size.width*0.25,
+        width: MediaQuery.of(context).size.width * 0.30,
         child: AspectRatio(
           aspectRatio: 1.33,
           child: VideoPlayer(_controller2),

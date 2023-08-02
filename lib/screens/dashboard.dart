@@ -135,7 +135,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     super.initState();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
     ]);
     _animationController = AnimationController(
       vsync: this,
@@ -222,11 +221,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     ];
 
     final tooltipsOnBar = lineBarsData[0];
-    return OrientationBuilder(builder: (context, orientation) {
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-      ]);
-      return Scaffold(
+    return Scaffold(
       appBar: PreferredSize(
           preferredSize: const Size.fromHeight(80.0),
           child:AppBar(
@@ -302,24 +297,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                 Navigator.of(context).pushNamed('/settings',arguments: [widget.user]);
               },
             ),
-         /*   ListTile(
-              leading: const Icon(Icons.delete_sweep),
-              title: const Text('Account Deletion Request',
-                  style: TextStyle(
-                    color: Colors.black,
-                  )),
-              onTap: () {
-                final Uri emailLaunchUri = Uri(
-                  scheme: 'mailto',
-                  path: 'support@datakalp.com',
-                  query: encodeQueryParameters(<String, String>{
-                    'subject': 'Request for permanent Account Deletion Request',
-                  }),
-                );
 
-                launchUrl(emailLaunchUri);
-              },
-            ),*/
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Logout',
@@ -337,47 +315,54 @@ class _DashboardScreenState extends State<DashboardScreen>
                 }
               },
             ),
-            Container(
-              padding: EdgeInsets.fromLTRB(15.0, MediaQuery.of(context).size.height-420, 0.0,0.0),
-             child: Center(
-                  child: RichText(text: const TextSpan(children: [
-                    TextSpan(
-                    text: 'Contact',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
-                  ]
-                  ),
-                textAlign: TextAlign.center,
-                  )),
-            ),
-            Container(
-              padding: const EdgeInsets.fromLTRB(15.0, 0, 0.0,0.0),
-              child: Center(
-                  child: GestureDetector(
-                      onTap: () async {
-                        final Uri emailLaunchUri = Uri(
-                            scheme: 'mailto',
-                            path: 'support@datakalp.com'
-                        );
-                        launchUrl(emailLaunchUri);
-                      },
-                      child:RichText(text: const TextSpan(children: [
-                    TextSpan(
-                        text: 'support@datakalp.com',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        )),
-                  ]
-                  ),
-                    textAlign: TextAlign.center,
-                  ))),
-            ),
+            Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  margin: const EdgeInsets.fromLTRB(0.0, 420.0, 0.0, 0.0),
+                  child: Center(
+                      child: RichText(text: const TextSpan(children: [
+                        TextSpan(
+                          text: 'Contact',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ]
+                      ),
+                        textAlign: TextAlign.center,
+                      )),
+                ),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(15.0, 0.0, 0.0,0.0),
+                  child: Center(
+                      child: GestureDetector(
+                          onTap: () async {
+                            final Uri emailLaunchUri = Uri(
+                                scheme: 'mailto',
+                                path: 'support@datakalp.com'
+                            );
+                            launchUrl(emailLaunchUri);
+                          },
+                          child:RichText(text: const TextSpan(children: [
+                            TextSpan(
+                                text: 'support@datakalp.com',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                )),
+                          ]
+                          ),
+                            textAlign: TextAlign.center,
+                          ))),
+                ),
+              ],
+            )
+
           ],
         ),
       ),
@@ -587,9 +572,47 @@ class _DashboardScreenState extends State<DashboardScreen>
                           width: (MediaQuery.of(context).size.width/2)-50,
                           height: 50.0,
                           child: Center(
-                            child: Text(
-                              l10n.practice_guide,
-                              style: const TextStyle(fontSize: 15.0,color:Colors.white,fontWeight: FontWeight.bold),
+                            child:RichText(
+                              textAlign: TextAlign.center,
+                              text:  TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: '${l10n.practice_guide}\n',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: '(${l10n.only} ',
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: '${widget.user.availableAttempts}',
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: ' ${l10n.attempts})',
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  /*   TextSpan(
+                              text: l10n.guide_message_part_3,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 15,
+                              ),
+                            ),*/
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -613,9 +636,40 @@ class _DashboardScreenState extends State<DashboardScreen>
                           width: (MediaQuery.of(context).size.width/2)-50,
                           height: 50.0,
                           child: Center(
-                            child: Text(
-                              l10n.practice_without_guide,
-                              style: const TextStyle(fontSize: 15.0,color:Colors.white,fontWeight: FontWeight.bold),
+                            child:RichText(
+                              textAlign: TextAlign.center,
+                              text:  TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: '${l10n.practice_without_guide}\n',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: '(${l10n.only} ',
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: '${widget.user.certificationAttempts}',
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: ' ${l10n.attempts})',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -838,7 +892,6 @@ class _DashboardScreenState extends State<DashboardScreen>
         ],
       )),
     );
-    });
   }
 }
 

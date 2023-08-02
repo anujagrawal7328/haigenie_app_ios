@@ -5,15 +5,15 @@ import '../services/authRepository.dart';
 List<TextEditingController> createControllers(int count) {
   return List<TextEditingController>.generate(count, (_) => TextEditingController());
 }
-class UpdatePassword extends StatefulWidget {
+class DeleteAccount extends StatefulWidget {
   final String? email;
   final String? token;
-  const UpdatePassword({super.key,required this.email,required this.token});
+  const DeleteAccount({super.key,required this.email,required this.token});
   @override
-  State<StatefulWidget> createState() => _UpdatePasswordState();
+  State<StatefulWidget> createState() => _DeleteAccountState();
 }
 
-class _UpdatePasswordState extends State<UpdatePassword> {
+class _DeleteAccountState extends State<DeleteAccount> {
   late List<TextEditingController> controllers;
 
   final AuthRepository authRepository = AuthRepository();
@@ -34,45 +34,38 @@ class _UpdatePasswordState extends State<UpdatePassword> {
     super.dispose();
   }
 
-  void _togglePasswordVisibility() {
-    setState(() {
-      _obscurePassword = !_obscurePassword;
-    });
-  }
 
   _validateForm() {
     setState(() {
-      _formIsValid =( controllers[0].text ==
-          controllers[1].text);
+      _formIsValid =true;
     });
   }
 
-  Future<void> update(ScaffoldMessengerState scaffoldMessenger) async {
-    String password = controllers[0].text;
+  Future<void> delete(ScaffoldMessengerState scaffoldMessenger) async {
     String email = controllers[2].text;
     String token = widget.token!;
-    final isUpdated = await authRepository.updateNewUser(email,password,token);
+    final isUpdated = await authRepository.deleteAccountAuthentication(email,token);
     if (isUpdated) {
       Navigator.pushReplacementNamed(context, '/auth');
       scaffoldMessenger.showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Success',
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Colors.green,
-          ),);
+        const SnackBar(
+          content: Text(
+            'Account Data Deleted Sucessfully',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.green,
+        ),);
     } else {
       scaffoldMessenger.showSnackBar(
         const SnackBar(
           content: Text(
-            'Invalid Request',
+            'Account Deletion Failed',
             style: TextStyle(color: Colors.white),
           ),
           backgroundColor: Colors.red,
         ),
       );
-     }
+    }
   }
 
   @override
@@ -106,44 +99,9 @@ class _UpdatePasswordState extends State<UpdatePassword> {
                 readOnly: true,
                 icon: const Icon(Icons.person, color: Colors.grey),
               ),
-              const SizedBox(height: 10.0),
-              CustomTextField(
-                controller: controllers[0],
-                validation:  _validateForm,
-                label: 'Password*',
-                icon: const Icon(Icons.lock, color: Colors.grey),
-                obscurePassword: _obscurePassword,
-                iconButton: IconButton(
-                  icon: Icon(
-                    _obscurePassword
-                        ? Icons.visibility
-                        : Icons.visibility_off,
-                    color: Colors.grey,
-                  ),
-                  onPressed: _togglePasswordVisibility,
-                ),
-              ),
-              const SizedBox(height: 10.0),
-              CustomTextField(
-                controller: controllers[1],
-                validation:  _validateForm,
-                label: 'Confirm Password*',
-                icon: const Icon(Icons.lock, color: Colors.grey),
-                obscurePassword: _obscurePassword,
-                iconButton: IconButton(
-                  icon: Icon(
-                    _obscurePassword
-                        ? Icons.visibility
-                        : Icons.visibility_off,
-                    color: Colors.grey,
-                  ),
-                  onPressed: _togglePasswordVisibility,
-                ),
-              ),
               const SizedBox(height: 20.0),
               ElevatedButton(
-                onPressed:
-                _formIsValid ? () => update(_scaffoldMessenger) : null,
+                onPressed: () => delete(_scaffoldMessenger) ,
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.resolveWith<Color>(
                         (Set<MaterialState> states) {
@@ -159,7 +117,7 @@ class _UpdatePasswordState extends State<UpdatePassword> {
                   height: 50.0,
                   alignment: Alignment.center,
                   child: const Text(
-                    'Update',
+                    'Delete',
                     style: TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
